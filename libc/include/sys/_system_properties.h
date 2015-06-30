@@ -58,6 +58,8 @@ struct prop_msg
 };
 
 #define PROP_MSG_SETPROP 1
+#define PROP_MSG_GETPROP 2
+#define PROP_MSG_LISTPROP 3
 
 /*
 ** Rules:

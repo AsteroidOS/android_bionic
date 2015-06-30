@@ -40,7 +40,7 @@
 // We need the extra level of indirection so that the .hidden directives
 // in the system call stubs don't cause __set_errno to be hidden, breaking
 // old NDK apps.
-
+#ifdef LIBC_STATIC
 // This one is for internal use only and used by both LP32 and LP64 assembler.
 extern "C" __LIBC_HIDDEN__ long __set_errno_internal(int n) {
   errno = n;
@@ -52,4 +52,5 @@ extern "C" __LIBC_HIDDEN__ long __set_errno_internal(int n) {
 extern "C" long __set_errno(int n) {
   return __set_errno_internal(n);
 }
+#endif
 #endif

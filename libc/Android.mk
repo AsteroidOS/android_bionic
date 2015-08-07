@@ -174,7 +174,6 @@ libc_bionic_ndk_src_files := \
     bionic/semaphore.cpp \
     bionic/send.cpp \
     bionic/setegid.cpp \
-    bionic/__set_errno.cpp \
     bionic/seteuid.cpp \
     bionic/setpgrp.cpp \
     bionic/sigaction.cpp \
@@ -1264,6 +1263,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
     $(libc_arch_static_src_files) \
+    bionic/__set_errno.cpp \
     bionic/libc_init_static.cpp
 
 LOCAL_C_INCLUDES := $(libc_common_c_includes)
@@ -1315,6 +1315,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
     $(libc_arch_static_src_files) \
+    bionic/__set_errno.cpp \
     bionic/malloc_debug_common.cpp \
     bionic/libc_init_static.cpp \
 
@@ -1373,7 +1374,7 @@ LOCAL_STRIP_MODULE := keep_symbols
 # create a "cloaked" dependency on libgcc.a in libc though the libraries, which is not what
 # you wanted!
 
-LOCAL_SHARED_LIBRARIES := libdl
+LOCAL_SHARED_LIBRARIES := libdl libdsyscalls
 LOCAL_WHOLE_STATIC_LIBRARIES := libc_common
 LOCAL_CXX_STL := none
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
@@ -1406,6 +1407,42 @@ LOCAL_NATIVE_COVERAGE := $(bionic_coverage)
 
 include $(BUILD_SHARED_LIBRARY)
 
+# ========================================================
+# libdsyscalls.so
+# ========================================================
+include $(CLEAR_VARS)
+
+# NOTE: --exclude-libs=libgcc.a makes sure that any symbols libdl.so pulls from
+# libgcc.a are made static to libdyscalls.so.  This in turn ensures that libraries that
+# a) pull symbols from libgcc.a and b) depend on libdl.so will not rely on libdl.so
+# to provide those symbols, but will instead pull them from libgcc.a.  Specifically,
+# we use this property to make sure libc.so has its own copy of the code from
+# libgcc.a it uses.
+#
+# DO NOT REMOVE --exclude-libs!
+
+LOCAL_LDFLAGS := -Wl,--exclude-libs=libgcc.a
+
+# for x86, exclude libgcc_eh.a for the same reasons as above
+LOCAL_LDFLAGS_x86 := -Wl,--exclude-libs=libgcc_eh.a
+LOCAL_LDFLAGS_x86_64 := $(LOCAL_LDFLAGS_x86)
+
+LOCAL_SRC_FILES:= hybris/libdsyscalls.c
+LOCAL_CFLAGS := -Wall -Wextra -Wunused -Werror
+
+LOCAL_MODULE := libdsyscalls
+LOCAL_CXX_STL := none
+LOCAL_ADDITIONAL_DEPENDENCIES := 
+
+# NOTE: libdl needs __aeabi_unwind_cpp_pr0 from libgcc.a but libgcc.a needs a
+# few symbols from libc. Using --no-undefined here results in having to link
+# against libc creating a circular dependency which is removed and we end up
+# with missing symbols. Since this library is just a bunch of stubs, we set
+# LOCAL_ALLOW_UNDEFINED_SYMBOLS to remove --no-undefined from the linker flags.
+LOCAL_ALLOW_UNDEFINED_SYMBOLS := true
+LOCAL_SYSTEM_SHARED_LIBRARIES :=
+
+include $(BUILD_SHARED_LIBRARY)
 
 # For all builds, except for the -user build we will enable memory
 # allocation checking (including memory leaks, buffer overwrites, etc.)

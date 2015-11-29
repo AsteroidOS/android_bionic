@@ -1432,6 +1432,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES :=
 # with missing symbols. Since this library is just a bunch of stubs, we set
 # LOCAL_ALLOW_UNDEFINED_SYMBOLS to remove --no-undefined from the linker flags.
 LOCAL_ALLOW_UNDEFINED_SYMBOLS := true
+LOCAL_CXX_STL := none
 LOCAL_SYSTEM_SHARED_LIBRARIES :=
 
 include $(BUILD_SHARED_LIBRARY)

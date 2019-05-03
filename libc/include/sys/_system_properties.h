@@ -44,6 +44,8 @@ __BEGIN_DECLS
 #define PROP_FILENAME "/dev/__properties__"
 
 #define PROP_MSG_SETPROP 1
+#define PROP_MSG_GETPROP 2
+#define PROP_MSG_LISTPROP 3
 #define PROP_MSG_SETPROP2 0x00020001
 
 #define PROP_SUCCESS 0

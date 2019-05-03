@@ -37,8 +37,6 @@
 
 #include "private/bionic_macros.h"
 
-#include "bionic/pthread_internal.h"
-
 // We only support two locales, the "C" locale (also known as "POSIX"),
 // and the "C.UTF-8" locale (also known as "en_US.UTF-8").
 
@@ -70,6 +68,7 @@ size_t __ctype_get_mb_cur_max() {
   }
 }
 
+static thread_local locale_t g_current_locale;
 static pthread_once_t g_locale_once = PTHREAD_ONCE_INIT;
 static lconv g_locale;
 
@@ -164,8 +163,7 @@ char* setlocale(int category, const char* locale_name) {
 }
 
 locale_t uselocale(locale_t new_locale) {
-  locale_t* locale_storage = &__get_bionic_tls().locale;
-  locale_t old_locale = *locale_storage;
+  locale_t old_locale = g_current_locale;
 
   // If this is the first call to uselocale(3) on this thread, we return LC_GLOBAL_LOCALE.
   if (old_locale == NULL) {
@@ -173,7 +171,7 @@ locale_t uselocale(locale_t new_locale) {
   }
 
   if (new_locale != NULL) {
-    *locale_storage = new_locale;
+    g_current_locale = new_locale;
   }
 
   return old_locale;

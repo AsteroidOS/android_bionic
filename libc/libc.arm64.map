@@ -1240,6 +1240,7 @@ LIBC_O {
 
 LIBC_PRIVATE {
   global:
+    __get_tls_hooks; # hybris
     android_getaddrinfofornet;
     android_getaddrinfofornetcontext;
     android_gethostbyaddrfornet;

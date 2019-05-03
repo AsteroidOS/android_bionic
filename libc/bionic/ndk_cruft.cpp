@@ -50,6 +50,18 @@
 
 extern "C" {
 
+void** __get_tls_hooks(void) {
+#include "private/__get_tls_internal.h"
+  return __get_tls_internal();
+}
+
+// TODO: does anything still need this?
+// with hybris we need it, so thanks for keeping it.
+void** __get_tls() {
+#include "private/__get_tls_internal.h"
+    return __get_tls_internal();
+}
+
 // LP64 doesn't need to support any legacy cruft.
 #if !defined(__LP64__)
 
@@ -66,12 +78,6 @@ pid_t __wait4(pid_t pid, int* status, int options, struct rusage* rusage) {
 // TODO: does anything still need this?
 int __open() {
   abort();
-}
-
-// TODO: does anything still need this?
-void** __get_tls() {
-#include "private/__get_tls.h"
-  return __get_tls();
 }
 
 // This non-standard function was in our <string.h> for some reason.

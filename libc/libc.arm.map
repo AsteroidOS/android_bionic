@@ -1416,6 +1416,7 @@ LIBC_PRIVATE {
     __gedf2; # arm
     __get_thread; # arm x86 mips
     __get_tls; # arm x86 mips
+    __get_tls_hooks; # hybris
     __getdents64; # arm x86 mips
     __gnu_ldivmod_helper; # arm
     __gnu_uldivmod_helper; # arm
